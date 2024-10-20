@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use log::error;
 use rocket::{
     fairing::{self, Fairing, Info, Kind},
@@ -20,6 +22,14 @@ pub struct PostgresFairing;
 #[derive(Debug, Clone, Deserialize)]
 pub struct PostgresConfig {
     url: String,
+}
+
+impl Deref for PostgresDb {
+    type Target = PostgresPool;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }
 
 impl PostgresFairing {
