@@ -2,13 +2,16 @@
 name = "api"
 version = "0.1.0"
 edition = "2021"
+authors = ["Lennox Schneider <admin@lennoxlotl.dev>"]
 
 [dependencies]
-rocket = {version = "0.5.1", features = ["json"]}
+rocket = { version = "0.5.1", features = ["json"] }
 aws-sdk-s3 = "1.57.0"
-aws-credential-types = {version = "1.2.1", features= ["hardcoded-credentials"]}
+aws-credential-types = { version = "1.2.1", features = ["hardcoded-credentials"] }
 aws-config = "1.5.8"
 async-trait = "0.1.83"
 serde = "1.0.210"
 thiserror = "1.0.64"
 rand = "0.8.5"
+macros = { path = "../macros" }
+sqlx = { version = "0.8.2", features = ["postgres", "runtime-tokio-native-tls"] }
