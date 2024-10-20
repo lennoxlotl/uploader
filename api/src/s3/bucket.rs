@@ -13,6 +13,7 @@ use aws_sdk_s3::{
 use super::credentials::BucketCredentials;
 
 /// Provides access to object-based storage buckets that are accessible using amazons s3 api spec
+#[derive(Debug, Clone)]
 pub struct Bucket {
     client: Client,
     name: String,
@@ -39,10 +40,11 @@ pub trait BucketOperations {
     ///
     /// # Returns
     /// Result of the insert
-    async fn put(
+    async fn put<'a>(
         &self,
         key: &str,
         bytes: ByteStream,
+        content_type: Option<&'a str>,
     ) -> Result<PutObjectOutput, SdkError<PutObjectError>>;
 }
 
@@ -88,16 +90,18 @@ impl BucketOperations for Bucket {
             .await
     }
 
-    async fn put(
+    async fn put<'a>(
         &self,
         key: &str,
         bytes: ByteStream,
+        content_type: Option<&'a str>,
     ) -> Result<PutObjectOutput, SdkError<PutObjectError>> {
         self.client
             .put_object()
             .bucket(self.name())
             .key(key)
             .body(bytes)
+            .content_type(content_type.unwrap_or("application/octet-stream"))
             .send()
             .await
     }

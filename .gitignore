@@ -4,3 +4,6 @@
 
 # Exclude build directories
 /target
+
+# Exclude configuration files
+Rocket.toml
