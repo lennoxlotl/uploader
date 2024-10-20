@@ -1,3 +1,6 @@
 # Exclude code editors and IDEs
 .idea
 .vscode
+
+# Exclude build directories
+/target
