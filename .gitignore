@@ -1,0 +1,3 @@
+# Exclude code editors and IDEs
+.idea
+.vscode
