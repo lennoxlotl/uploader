@@ -40,11 +40,11 @@ pub trait BucketOperations {
     ///
     /// # Returns
     /// Result of the insert
-    async fn put<'a>(
+    async fn put(
         &self,
         key: &str,
         bytes: ByteStream,
-        content_type: Option<&'a str>,
+        content_type: Option<&str>,
     ) -> Result<PutObjectOutput, SdkError<PutObjectError>>;
 }
 
@@ -90,11 +90,11 @@ impl BucketOperations for Bucket {
             .await
     }
 
-    async fn put<'a>(
+    async fn put(
         &self,
         key: &str,
         bytes: ByteStream,
-        content_type: Option<&'a str>,
+        content_type: Option<&str>,
     ) -> Result<PutObjectOutput, SdkError<PutObjectError>> {
         self.client
             .put_object()

@@ -52,6 +52,7 @@ dependencies = [
  "aws-config",
  "aws-credential-types",
  "aws-sdk-s3",
+ "rand",
  "rocket",
  "serde",
  "thiserror",

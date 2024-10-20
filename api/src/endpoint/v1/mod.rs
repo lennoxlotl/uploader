@@ -14,6 +14,15 @@ pub fn create_v1_routes() -> Vec<Route> {
     rocket::routes![image::upload::upload]
 }
 
+/// Converts a tokio buffer (from form data) to a with the s3 api usable bytestream
+///
+/// # Arguments
+///
+/// * `stream` - The mutable byte buf
+///
+/// # Returns
+///
+/// The converted stream
 pub(crate) async fn convert_to_byte_stream<T>(stream: &mut T) -> Result<ByteStream, error::Error>
 where
     T: AsyncBufRead + AsyncReadExt + Unpin,
