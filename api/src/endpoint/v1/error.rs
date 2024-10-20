@@ -10,6 +10,8 @@ use serde::Serialize;
 pub enum Error {
     #[error("Failed to upload image to storage bucket")]
     BucketConnectionError,
+    #[error("Failed to convert image byte stream")]
+    ImageConvertError,
 }
 
 #[derive(Debug, Serialize)]
