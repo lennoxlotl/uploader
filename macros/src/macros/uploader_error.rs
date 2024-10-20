@@ -4,7 +4,7 @@ use syn::{Attribute, Data, DeriveInput, LitInt, Token};
 
 type TokenStream2 = proc_macro2::TokenStream;
 
-// The attributes which are extracted from the `RocketError` macro
+// The attributes which are extracted from the `UploaderError` macro
 #[derive(Debug, Clone)]
 struct UploaderErrorAttributes {
     status_code: Option<u16>,
