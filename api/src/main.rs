@@ -1,5 +1,5 @@
 use crate::endpoint::v1::create_v1_routes;
-use endpoint::fairing::bucket::BucketFairing;
+use endpoint::fairing::{bucket::BucketFairing, database::PostgresFairing};
 use rocket::fairing::AdHoc;
 use serde::{Deserialize, Serialize};
 
@@ -18,6 +18,7 @@ async fn main() -> Result<(), rocket::Error> {
         .mount("/api/v1/", create_v1_routes())
         .attach(AdHoc::config::<GlobalConfig>())
         .attach(BucketFairing::new())
+        .attach(PostgresFairing::new())
         .launch()
         .await?;
     Ok(())

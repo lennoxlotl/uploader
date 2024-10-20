@@ -20,6 +20,9 @@ pub enum Error {
     #[error("Failed to convert image byte stream")]
     #[uploader(status_code = 500)]
     ImageConvertError,
+    #[error("Failed to execute database operation")]
+    #[uploader(status_code = 500)]
+    DatabaseError,
 }
 
 #[derive(Debug, Serialize)]

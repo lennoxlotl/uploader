@@ -9,6 +9,7 @@ use std::ops::Deref;
 
 use crate::s3::{bucket::Bucket, credentials::BucketCredentials};
 
+/// Provides access to object storage buckets implementing the s3 api
 #[derive(Debug, Clone)]
 pub struct BucketGuard(pub Bucket);
 

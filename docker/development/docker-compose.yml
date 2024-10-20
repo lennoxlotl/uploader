@@ -1,0 +1,16 @@
+name: "uploader-development-containers"
+
+services:
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: uploader
+      POSTGRES_PASSWORD: password
+
+volumes:
+  postgres:

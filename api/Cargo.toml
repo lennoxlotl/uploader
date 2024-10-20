@@ -15,3 +15,5 @@ thiserror = "1.0.64"
 rand = "0.8.5"
 macros = { path = "../macros" }
 sqlx = { version = "0.8.2", features = ["postgres", "runtime-tokio-native-tls"] }
+uuid = { version = "1.11.0", features = ["v4"] }
+log = "0.4.22"

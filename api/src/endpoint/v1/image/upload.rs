@@ -3,6 +3,7 @@ use rand::Rng;
 use rocket::form::{Form, FromForm};
 use rocket::fs::TempFile;
 use rocket::{post, State};
+use uuid::Uuid;
 
 use crate::endpoint::fairing::bucket::BucketGuard;
 use crate::endpoint::v1::error::Error;
@@ -23,7 +24,7 @@ pub async fn upload(
 ) -> UploaderResult<&'static str> {
     bucket
         .put(
-            generate_image_id(config.image_id_length).as_str(),
+            &Uuid::new_v4().to_string().replace("-", ""),
             convert_to_byte_stream(
                 &mut image_data
                     .image
