@@ -4,3 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+rocket = "0.5.1"
+aws-sdk-s3 = "1.57.0"
+aws-credential-types = {version = "1.2.1", features= ["hardcoded-credentials"]}
+aws-config = "1.5.8"
+async-trait = "0.1.83"
