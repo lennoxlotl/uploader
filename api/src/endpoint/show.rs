@@ -34,12 +34,14 @@ impl<'r> Responder<'r, 'static> for ImageShowResponse {
 
 #[get("/<id>")]
 pub async fn show_image(
-    id: String,
+    id: &str,
     database: PostgresDb,
     bucket: BucketGuard,
 ) -> UploaderResult<ImageShowResponse> {
     let mut transaction = database.begin().await.map_err(|_| Error::DatabaseError)?;
-    let image = find_image_by_id(&mut transaction, &id).await.unwrap();
+    let image = find_image_by_id(&mut transaction, &id.to_string())
+        .await
+        .unwrap();
     let data = bucket.get(&image.bucket_id).await.unwrap();
     let image_type = &data.content_type.ok_or(Error::ImageConvertError)?;
     let image_bytes = data
