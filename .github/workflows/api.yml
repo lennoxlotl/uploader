@@ -25,9 +25,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Setup environment
-        run: |
-          echo "SHORT_COMMIT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-          echo "BRANCH_NAME=$(git branch --show-current)" >> $GITHUB_ENV
+        run: echo "ARCH=$(uname -m)" >> $GITHUB_ENV
       - name: Build binary
         run: cargo build --release
       - name: Copy binary
@@ -46,7 +44,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ env.RUNNER_ARCH }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ env.ARCH }}
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
