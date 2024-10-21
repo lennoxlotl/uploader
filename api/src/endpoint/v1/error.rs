@@ -14,6 +14,9 @@ pub struct ErrorAttributes {
 
 #[derive(Debug, Clone, thiserror::Error, UploaderError)]
 pub enum Error {
+    #[error("The image does not exist")]
+    #[uploader(status_code = 404)]
+    ImageNotFoundError,
     #[error("Failed to upload image to storage bucket")]
     #[uploader(status_code = 500)]
     BucketConnectionError,

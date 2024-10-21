@@ -41,7 +41,7 @@ pub async fn show_image(
     let mut transaction = database.begin().await.map_err(|_| Error::DatabaseError)?;
     let image = find_image_by_id(&mut transaction, &id.to_string())
         .await
-        .unwrap();
+        .map_err(|_| Error::ImageNotFoundError)?;
     let data = bucket.get(&image.bucket_id).await.unwrap();
     let image_type = &data.content_type.ok_or(Error::ImageConvertError)?;
     let image_bytes = data
