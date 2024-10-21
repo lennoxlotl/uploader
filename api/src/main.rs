@@ -13,6 +13,8 @@ pub struct GlobalConfig {
     public_url: String,
     // Length of the image id used for "shwoing" the image
     image_id_length: usize,
+    // If not empty requires an authentication header containing this key for uploads
+    auth_key: Option<String>,
 }
 
 #[rocket::main]

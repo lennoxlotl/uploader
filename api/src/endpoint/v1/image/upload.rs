@@ -1,10 +1,14 @@
+use std::convert::Infallible;
+
 use rand::distributions::Alphanumeric;
 use rand::Rng;
 use rocket::form::{Form, FromForm};
 use rocket::fs::TempFile;
 use rocket::http::ContentType;
+use rocket::outcome::Outcome;
+use rocket::request::{self, FromRequest};
 use rocket::serde::json::Json;
-use rocket::{post, Responder, State};
+use rocket::{post, Request, Responder, State};
 use serde::Serialize;
 use uuid::Uuid;
 
@@ -20,6 +24,8 @@ use crate::GlobalConfig;
 pub struct ImageData<'r> {
     image: TempFile<'r>,
 }
+
+pub struct AuthToken(String);
 
 #[derive(Responder)]
 #[response(status = 200, content_type = "json")]
@@ -41,17 +47,37 @@ impl UploadResponse {
     }
 }
 
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for AuthToken {
+    type Error = Infallible;
+
+    async fn from_request(request: &'r Request<'_>) -> request::Outcome<Self, Self::Error> {
+        let token = request.headers().get_one("Authorization");
+        match token {
+            Some(token) => Outcome::Success(AuthToken(token.to_string())),
+            None => Outcome::Success(AuthToken("".into())),
+        }
+    }
+}
+
 #[post("/image/upload", data = "<image_data>")]
 pub async fn upload(
     image_data: Form<ImageData<'_>>,
     bucket: BucketGuard,
     database: PostgresDb,
     config: &State<GlobalConfig>,
+    token: AuthToken,
 ) -> UploaderResult<UploadResponse> {
     let mut transaction = database.begin().await.map_err(|_| Error::DatabaseError)?;
     let bucket_id = Uuid::new_v4().to_string().replace("-", "");
     let secret = Uuid::new_v4().to_string().replace("-", "");
     let id = generate_image_id(config.image_id_length);
+
+    if let Some(auth_key) = &config.auth_key {
+        if auth_key != &token.0 {
+            return Err(Error::Unauthorized);
+        }
+    }
 
     // As we use transactions, if the image upload fails the image will be dropped
     save_image(

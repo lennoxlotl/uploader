@@ -14,6 +14,9 @@ pub struct ErrorAttributes {
 
 #[derive(Debug, Clone, thiserror::Error, UploaderError)]
 pub enum Error {
+    #[error("Invalid auth key")]
+    #[uploader(status_code = 403)]
+    Unauthorized,
     #[error("The uploaded image is too large")]
     #[uploader(status_code = 403)]
     ImageTooLargeError,
