@@ -1,0 +1,27 @@
+name: "uploader-containers"
+
+services:
+  postgres:
+    image: postgres
+    restart: always
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: uploader
+      POSTGRES_PASSWORD: password
+  api:
+    image: ghcr.io/lennoxlotl/uploader:bcea60c-arm64
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    links:
+      - "postgres"
+    volumes:
+      - type: bind
+        source: ./Rocket.toml
+        target: /api/Rocket.toml
+
+volumes:
+  postgres:
