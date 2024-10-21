@@ -56,7 +56,7 @@ jobs:
           file: apps/api/Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-  combine:
-    name: Combine docker manifests
-    runs-on: ubuntu-22.04
-    steps:
+  # combine:
+  #   name: Combine docker manifests
+  #   runs-on: ubuntu-22.04
+  #   steps:
