@@ -50,8 +50,8 @@ jobs:
         with:
           push: true
           platforms: linux/arm64
-          context: apps/api
-          file: apps/api/Dockerfile
+          context: api
+          file: api/Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
   # combine:
