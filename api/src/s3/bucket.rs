@@ -9,6 +9,7 @@ use aws_sdk_s3::{
     primitives::ByteStream,
     Client, Config,
 };
+use rocket::futures::FutureExt;
 
 use super::credentials::BucketCredentials;
 

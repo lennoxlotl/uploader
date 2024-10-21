@@ -2,6 +2,7 @@ use rand::distributions::Alphanumeric;
 use rand::Rng;
 use rocket::form::{Form, FromForm};
 use rocket::fs::TempFile;
+use rocket::http::ContentType;
 use rocket::serde::json::Json;
 use rocket::{post, Responder, State};
 use serde::Serialize;
@@ -73,7 +74,13 @@ pub async fn upload(
                     .map_err(|_| Error::ImageConvertError)?,
             )
             .await?,
-            Some("image/png"),
+            Some(
+                &image_data
+                    .image
+                    .content_type()
+                    .unwrap_or(&ContentType::default())
+                    .to_string(),
+            ),
         )
         .await
         .map_err(|_| Error::BucketConnectionError)?;
