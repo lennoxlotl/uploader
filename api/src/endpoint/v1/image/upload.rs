@@ -91,8 +91,8 @@ pub async fn upload(
         .map_err(|_| Error::DatabaseError)?;
     // TODO: Make api url configurable
     Ok(UploadResponse::new(
-        format!("http://localhost:8000/{}", &id),
-        format!("http://localhost:8000/api/v1/image/delete/{}", &secret),
+        format!("{}/{}", config.public_url, &id),
+        format!("{}/api/v1/image/delete/{}", config.public_url, &secret),
     ))
 }
 

@@ -9,6 +9,7 @@ pub mod s3;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GlobalConfig {
+    public_url: String,
     image_id_length: usize,
 }
 
