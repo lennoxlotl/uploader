@@ -36,6 +36,5 @@ jobs:
         with:
           push: true
           platforms: linux/arm64, linux/amd64
-          context: api
           file: api/Dockerfile
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
