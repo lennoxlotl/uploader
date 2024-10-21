@@ -1,10 +1,18 @@
+# Build the binary file
+FROM rust:1.82.0-bullseye AS builder
+
+WORKDIR /api
+COPY . .
+
+RUN cargo build --release
+
+# Run the binary file
 FROM debian:bullseye-slim
 
-WORKDIR /opt/api
-COPY ./api .
+WORKDIR /api
+COPY --from=builder /api/target/release/api ./api
 
 RUN apt update && apt install -y ca-certificates
-RUN chmod +x /opt/api/api
 
 EXPOSE 8000
-CMD ["/opt/api/api"]
+CMD ["api"]
