@@ -26,6 +26,20 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Install cross
+        run: cargo install cross
+      - name: Build binary (aarch64)
+        if: matrix.platform == 'linux/arm64'
+        run: cross build --target aarch64-unknown-linux-gnu --release
+      - name: Copy binary (aarch64)
+        if: matrix.platform == 'linux/arm64'
+        run: mv target/aarch64-unknown-linux-gnu/release/api api/api
+      - name: Build binary (amd64)
+        if: matrix.platform == 'linux/amd64'
+        run: cargo build --release
+      - name: Copy binary (amd64)
+        if: matrix.platform == 'linux/amd64'
+        run: mv target/release/api api/api
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -46,6 +60,7 @@ jobs:
         with:
           push: true
           platforms: ${{ matrix.platform }}
+          context: api/
           file: api/Dockerfile
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
