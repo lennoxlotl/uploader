@@ -14,17 +14,6 @@ pub async fn find_image_by_id(
         .await
 }
 
-/// Finds an image by it's secret id (given to uploader for deletion)
-pub async fn find_image_by_secret(
-    transaction: &mut PgTransaction<'_>,
-    secret: &String,
-) -> DbResult<ImageEntity> {
-    sqlx::query_as::<_, ImageEntity>(r"SELECT * FROM images WHERE secret = $1")
-        .bind(&secret)
-        .fetch_one(&mut **transaction)
-        .await
-}
-
 /// Inserts an image into the database
 pub async fn save_image(
     transaction: &mut PgTransaction<'_>,
@@ -50,12 +39,11 @@ pub async fn save_image(
 pub async fn delete_image_by_secret(
     transaction: &mut PgTransaction<'_>,
     secret: &String,
-) -> DbResult<()> {
-    sqlx::query(r"DELETE FROM images WHERE secret = $1")
+) -> DbResult<ImageEntity> {
+    sqlx::query_as::<_, ImageEntity>(r"DELETE FROM images WHERE secret = $1 RETURNING *")
         .bind(&secret)
-        .execute(&mut **transaction)
+        .fetch_one(&mut **transaction)
         .await
-        .map(|_| ())
 }
 
 /// Returns the time passed since the unix epoch in ms

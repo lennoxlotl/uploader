@@ -9,7 +9,9 @@ pub mod s3;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GlobalConfig {
+    // Public server url
     public_url: String,
+    // Length of the image id used for "shwoing" the image
     image_id_length: usize,
 }
 

@@ -11,7 +11,11 @@ pub type UploaderResult<T> = std::result::Result<T, error::Error>;
 
 /// Creates all /api/v1/ routes for initialization
 pub fn create_v1_routes() -> Vec<Route> {
-    rocket::routes![image::upload::upload]
+    rocket::routes![
+        image::upload::upload,
+        image::delete::delete,
+        image::delete::delete_get
+    ]
 }
 
 /// Converts a tokio buffer (from form data) to a with the s3 api usable bytestream

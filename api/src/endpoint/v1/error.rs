@@ -14,9 +14,15 @@ pub struct ErrorAttributes {
 
 #[derive(Debug, Clone, thiserror::Error, UploaderError)]
 pub enum Error {
+    #[error("The uploaded image is too large")]
+    #[uploader(status_code = 403)]
+    ImageTooLargeError,
     #[error("The image does not exist")]
     #[uploader(status_code = 404)]
     ImageNotFoundError,
+    #[error("Failed to delete image from bucket, try again later")]
+    #[uploader(status_code = 500)]
+    BucketDeleteError,
     #[error("Failed to upload image to storage bucket")]
     #[uploader(status_code = 500)]
     BucketConnectionError,

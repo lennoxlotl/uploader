@@ -3,13 +3,13 @@ use async_trait::async_trait;
 use aws_sdk_s3::{
     error::SdkError,
     operation::{
+        delete_object::{DeleteObjectError, DeleteObjectOutput},
         get_object::{GetObjectError, GetObjectOutput},
         put_object::{PutObjectError, PutObjectOutput},
     },
     primitives::ByteStream,
     Client, Config,
 };
-use rocket::futures::FutureExt;
 
 use super::credentials::BucketCredentials;
 
@@ -22,17 +22,18 @@ pub struct Bucket {
 
 #[async_trait]
 pub trait BucketOperations {
-    /// Gets an item from the bucket
+    /// Gets an object from the bucket
     ///
     /// # Arguments
     ///
     /// * `key` - The key of the object
     ///
     /// # Returns
+    ///
     /// The object
     async fn get(&self, key: &str) -> Result<GetObjectOutput, SdkError<GetObjectError>>;
 
-    /// Puts an item into the bucket
+    /// Puts an object into the bucket
     ///
     /// # Arguments
     ///
@@ -40,6 +41,7 @@ pub trait BucketOperations {
     /// * `bytes` - The bytes of the object to be created
     ///
     /// # Returns
+    ///
     /// Result of the insert
     async fn put(
         &self,
@@ -47,6 +49,17 @@ pub trait BucketOperations {
         bytes: ByteStream,
         content_type: Option<&str>,
     ) -> Result<PutObjectOutput, SdkError<PutObjectError>>;
+
+    /// Deletes an object from the bucket
+    ///
+    /// # Arguments
+    ///
+    /// * `key` The key of the object
+    ///
+    /// # Returns
+    ///
+    /// Result of the delete
+    async fn delete(&self, key: &str) -> Result<DeleteObjectOutput, SdkError<DeleteObjectError>>;
 }
 
 impl Bucket {
@@ -103,6 +116,15 @@ impl BucketOperations for Bucket {
             .key(key)
             .body(bytes)
             .content_type(content_type.unwrap_or("application/octet-stream"))
+            .send()
+            .await
+    }
+
+    async fn delete(&self, key: &str) -> Result<DeleteObjectOutput, SdkError<DeleteObjectError>> {
+        self.client
+            .delete_object()
+            .bucket(self.name())
+            .key(key)
             .send()
             .await
     }
