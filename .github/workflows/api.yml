@@ -27,6 +27,8 @@ jobs:
           - { docker: linux/amd64, fancy: amd64 }
           - { docker: linux/arm64, fancy: arm64 }
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Prepare environment
         run: |
           if [[ $GITHUB_REF == refs/tags/* ]]; then
@@ -34,8 +36,6 @@ jobs:
           else
             echo "VERSION=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_ENV
           fi
-      - name: Checkout repository
-        uses: actions/checkout@v4
       - name: Install cross (for aarch64 builds)
         if: matrix.platform.fancy == 'arm64'
         run: cargo install cross
