@@ -26,7 +26,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Install cross
+      - name: Install cross (for aarch64 builds)
+        if: matrix.platform == 'linux/arm64'
         run: cargo install cross
       - name: Build binary (aarch64)
         if: matrix.platform == 'linux/arm64'
