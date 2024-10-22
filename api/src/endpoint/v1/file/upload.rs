@@ -12,7 +12,7 @@ use rocket::{post, Request, Responder, State};
 use serde::Serialize;
 use uuid::Uuid;
 
-use crate::database::query::image::save_image;
+use crate::database::query::file::save_file;
 use crate::endpoint::fairing::bucket::BucketGuard;
 use crate::endpoint::fairing::database::PostgresDb;
 use crate::endpoint::v1::error::Error;
@@ -21,8 +21,8 @@ use crate::s3::bucket::BucketOperations;
 use crate::GlobalConfig;
 
 #[derive(FromForm)]
-pub struct ImageData<'r> {
-    image: TempFile<'r>,
+pub struct FileData<'r> {
+    file: TempFile<'r>,
 }
 
 pub struct AuthToken(String);
@@ -60,9 +60,9 @@ impl<'r> FromRequest<'r> for AuthToken {
     }
 }
 
-#[post("/image/upload", data = "<image_data>")]
+#[post("/file/upload", data = "<file_data>")]
 pub async fn upload(
-    image_data: Form<ImageData<'_>>,
+    file_data: Form<FileData<'_>>,
     bucket: BucketGuard,
     database: PostgresDb,
     config: &State<GlobalConfig>,
@@ -71,7 +71,7 @@ pub async fn upload(
     let mut transaction = database.begin().await.map_err(|_| Error::DatabaseError)?;
     let bucket_id = Uuid::new_v4().to_string().replace("-", "");
     let secret = Uuid::new_v4().to_string().replace("-", "");
-    let id = generate_image_id(config.image_id_length);
+    let id = generate_file_id(config.file_id_length);
 
     if let Some(auth_key) = &config.auth_key {
         if auth_key != &token.0 {
@@ -80,12 +80,12 @@ pub async fn upload(
     }
 
     // As we use transactions, if the image upload fails the image will be dropped
-    save_image(
+    save_file(
         &mut transaction,
         &id,
         &bucket_id.to_string(),
         &secret,
-        &(image_data.image.len() as i64),
+        &(file_data.file.len() as i64),
     )
     .await
     .map_err(|_| Error::DatabaseError)?;
@@ -93,16 +93,16 @@ pub async fn upload(
         .put(
             &bucket_id,
             convert_to_byte_stream(
-                &mut image_data
-                    .image
+                &mut file_data
+                    .file
                     .open()
                     .await
-                    .map_err(|_| Error::ImageConvertError)?,
+                    .map_err(|_| Error::FileConvertError)?,
             )
             .await?,
             Some(
-                &image_data
-                    .image
+                &file_data
+                    .file
                     .content_type()
                     .unwrap_or(&ContentType::default())
                     .to_string(),
@@ -122,11 +122,11 @@ pub async fn upload(
     ))
 }
 
-/// Generates a randomized image id
+/// Generates a randomized file id
 ///
 /// # Arguments
 /// * `size` - The amount of characters to generate
-fn generate_image_id(size: usize) -> String {
+fn generate_file_id(size: usize) -> String {
     rand::thread_rng()
         .sample_iter(&Alphanumeric)
         .take(size)

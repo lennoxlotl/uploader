@@ -1,5 +1,5 @@
 use crate::{
-    database::query::image::delete_image_by_secret,
+    database::query::file::delete_file_by_secret,
     endpoint::{
         fairing::{bucket::BucketGuard, database::PostgresDb},
         v1::{error::Error, UploaderResult},
@@ -8,25 +8,25 @@ use crate::{
 };
 use rocket::{delete, get};
 
-// Also offer deletion using GET requests as some screenshotting tools do that unfortunately
-#[get("/image/delete/<id>")]
+// Also offer deletion using GET requests as some screenshotting / uploading tools do that unfortunately
+#[get("/file/delete/<id>")]
 pub async fn delete_get(id: &str, database: PostgresDb, bucket: BucketGuard) -> UploaderResult<()> {
     inner_delete(id, database, bucket).await
 }
 
-#[delete("/image/delete/<id>")]
+#[delete("/file/delete/<id>")]
 pub async fn delete(id: &str, database: PostgresDb, bucket: BucketGuard) -> UploaderResult<()> {
     inner_delete(id, database, bucket).await
 }
 
-/// Deletes an image by its secret id, this prevents unauthorized third parties to
+/// Deletes a file by its secret id, this prevents unauthorized third parties to
 /// delete random image ids
 async fn inner_delete(id: &str, database: PostgresDb, bucket: BucketGuard) -> UploaderResult<()> {
     let mut transaction = database.begin().await.map_err(|_| Error::DatabaseError)?;
 
-    let image = delete_image_by_secret(&mut transaction, &id.to_string())
+    let image = delete_file_by_secret(&mut transaction, &id.to_string())
         .await
-        .map_err(|_| Error::ImageNotFoundError)?;
+        .map_err(|_| Error::FileNotFoundError)?;
     bucket
         .delete(&image.bucket_id.as_str())
         .await

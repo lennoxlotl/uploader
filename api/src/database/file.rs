@@ -1,9 +1,9 @@
 use macros::PostgresRow;
 use sqlx::Row;
 
-/// Stores information about an uploaded image
+/// Stores information about an uploaded file
 #[derive(Debug, Clone, PostgresRow)]
-pub struct ImageEntity {
+pub struct FileEntity {
     pub id: String,
     pub bucket_id: String,
     pub secret: String,

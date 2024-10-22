@@ -1,21 +1,21 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use super::{DbResult, PgTransaction};
-use crate::database::image::ImageEntity;
+use crate::database::file::FileEntity;
 
-/// Finds an image by it's public id
-pub async fn find_image_by_id(
+/// Finds a file by it's public id
+pub async fn find_file_by_id(
     transaction: &mut PgTransaction<'_>,
     id: &String,
-) -> DbResult<ImageEntity> {
-    sqlx::query_as::<_, ImageEntity>(r"SELECT * FROM images WHERE id = $1")
+) -> DbResult<FileEntity> {
+    sqlx::query_as::<_, FileEntity>(r"SELECT * FROM files WHERE id = $1")
         .bind(&id)
         .fetch_one(&mut **transaction)
         .await
 }
 
-/// Inserts an image into the database
-pub async fn save_image(
+/// Inserts a file into the database
+pub async fn save_file(
     transaction: &mut PgTransaction<'_>,
     id: &String,
     bucket_id: &String,
@@ -23,7 +23,7 @@ pub async fn save_image(
     size: &i64,
 ) -> DbResult<()> {
     sqlx::query(
-        r"INSERT INTO images (id, bucket_id, secret, uploaded_at, size) VALUES ($1, $2, $3, $4, $5)",
+        r"INSERT INTO files (id, bucket_id, secret, uploaded_at, size) VALUES ($1, $2, $3, $4, $5)",
     )
     .bind(&id)
     .bind(&bucket_id)
@@ -35,12 +35,12 @@ pub async fn save_image(
     .map(|_| ())
 }
 
-/// Deletes an image by it's secret id (given to uploader for deletion)
-pub async fn delete_image_by_secret(
+/// Deletes a file by it's secret id (given to uploader for deletion)
+pub async fn delete_file_by_secret(
     transaction: &mut PgTransaction<'_>,
     secret: &String,
-) -> DbResult<ImageEntity> {
-    sqlx::query_as::<_, ImageEntity>(r"DELETE FROM images WHERE secret = $1 RETURNING *")
+) -> DbResult<FileEntity> {
+    sqlx::query_as::<_, FileEntity>(r"DELETE FROM files WHERE secret = $1 RETURNING *")
         .bind(&secret)
         .fetch_one(&mut **transaction)
         .await

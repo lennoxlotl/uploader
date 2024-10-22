@@ -17,21 +17,21 @@ pub enum Error {
     #[error("Invalid auth key")]
     #[uploader(status_code = 403)]
     Unauthorized,
-    #[error("The uploaded image is too large")]
+    #[error("The file image is too large")]
     #[uploader(status_code = 403)]
-    ImageTooLargeError,
-    #[error("The image does not exist")]
+    FileTooLargeError,
+    #[error("The file does not exist")]
     #[uploader(status_code = 404)]
-    ImageNotFoundError,
-    #[error("Failed to delete image from bucket, try again later")]
+    FileNotFoundError,
+    #[error("Failed to delete file from bucket, try again later")]
     #[uploader(status_code = 500)]
     BucketDeleteError,
-    #[error("Failed to upload image to storage bucket")]
+    #[error("Failed to upload file to storage bucket")]
     #[uploader(status_code = 500)]
     BucketConnectionError,
-    #[error("Failed to convert image byte stream")]
+    #[error("Failed to convert file byte stream")]
     #[uploader(status_code = 500)]
-    ImageConvertError,
+    FileConvertError,
     #[error("Failed to execute database operation")]
     #[uploader(status_code = 500)]
     DatabaseError,
