@@ -1,0 +1,19 @@
+[default]
+file_id_length = 8
+max_image_size = 16
+cache_length = 86400
+public_url = "http://localhost:8000"
+auth_key = "hi"
+
+[default.limits]
+data-form = "16MiB"
+file = "16MiB"
+
+[default.bucket]
+access_key = ""
+access_key_secret = ""
+name = "files"
+url = ""
+
+[default.database]
+url = "postgres://uploader:password@localhost:5432/uploader"
