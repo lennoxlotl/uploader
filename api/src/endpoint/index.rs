@@ -59,10 +59,10 @@ pub async fn show_file(
     config: &State<GlobalConfig>,
 ) -> UploaderResult<FileShowResponse> {
     let mut transaction = database.begin().await.map_err(|_| Error::DatabaseError)?;
-    let image = find_file_by_id(&mut transaction, &id.to_string())
+    let file = find_file_by_id(&mut transaction, &id.to_string())
         .await
         .map_err(|_| Error::FileNotFoundError)?;
-    let data = bucket.get(&image.bucket_id).await.unwrap();
+    let data = bucket.get(&file.bucket_id).await.unwrap();
     let file_type = &data.content_type.ok_or(Error::FileConvertError)?;
     let file_bytes = data
         .body

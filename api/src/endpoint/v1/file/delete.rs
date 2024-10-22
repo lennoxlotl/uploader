@@ -20,15 +20,15 @@ pub async fn delete(id: &str, database: PostgresDb, bucket: BucketGuard) -> Uplo
 }
 
 /// Deletes a file by its secret id, this prevents unauthorized third parties to
-/// delete random image ids
+/// delete random file ids
 async fn inner_delete(id: &str, database: PostgresDb, bucket: BucketGuard) -> UploaderResult<()> {
     let mut transaction = database.begin().await.map_err(|_| Error::DatabaseError)?;
 
-    let image = delete_file_by_secret(&mut transaction, &id.to_string())
+    let file = delete_file_by_secret(&mut transaction, &id.to_string())
         .await
         .map_err(|_| Error::FileNotFoundError)?;
     bucket
-        .delete(&image.bucket_id.as_str())
+        .delete(&file.bucket_id.as_str())
         .await
         .map_err(|_| Error::BucketDeleteError)?;
 

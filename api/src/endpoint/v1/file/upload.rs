@@ -79,7 +79,7 @@ pub async fn upload(
         }
     }
 
-    // As we use transactions, if the image upload fails the image will be dropped
+    // As we use transactions, if the file upload fails the file will be dropped
     save_file(
         &mut transaction,
         &id,
@@ -118,7 +118,7 @@ pub async fn upload(
     // TODO: Make api url configurable
     Ok(UploadResponse::new(
         format!("{}/{}", config.public_url, &id),
-        format!("{}/api/v1/image/delete/{}", config.public_url, &secret),
+        format!("{}/api/v1/file/delete/{}", config.public_url, &secret),
     ))
 }
 

@@ -17,7 +17,7 @@ pub enum Error {
     #[error("Invalid auth key")]
     #[uploader(status_code = 403)]
     Unauthorized,
-    #[error("The file image is too large")]
+    #[error("The file is too large")]
     #[uploader(status_code = 403)]
     FileTooLargeError,
     #[error("The file does not exist")]

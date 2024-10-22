@@ -11,7 +11,7 @@ pub mod s3;
 pub struct GlobalConfig {
     // Public server url
     public_url: String,
-    // Length of the file id used for "shwoing" the image
+    // Length of the file id used for "shwoing" the file
     file_id_length: usize,
     // Defines a Cache-Control header, time is in seconds
     cache_length: Option<usize>,
