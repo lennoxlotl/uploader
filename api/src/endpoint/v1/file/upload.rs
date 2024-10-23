@@ -13,11 +13,10 @@ use serde::Serialize;
 use uuid::Uuid;
 
 use crate::database::query::file::save_file;
-use crate::endpoint::fairing::bucket::BucketGuard;
 use crate::endpoint::fairing::database::PostgresDb;
+use crate::endpoint::fairing::storage::StorageDriverGuard;
 use crate::endpoint::v1::error::Error;
-use crate::endpoint::v1::{convert_to_byte_stream, UploaderResult};
-use crate::s3::bucket::BucketOperations;
+use crate::endpoint::v1::{convert_to_bytes, UploaderResult};
 use crate::GlobalConfig;
 
 #[derive(FromForm)]
@@ -63,7 +62,7 @@ impl<'r> FromRequest<'r> for AuthToken {
 #[post("/file/upload", data = "<file_data>")]
 pub async fn upload(
     file_data: Form<FileData<'_>>,
-    bucket: BucketGuard,
+    storage: StorageDriverGuard,
     database: PostgresDb,
     config: &State<GlobalConfig>,
     token: AuthToken,
@@ -89,10 +88,15 @@ pub async fn upload(
     )
     .await
     .map_err(|_| Error::DatabaseError)?;
-    bucket
-        .put(
+    storage
+        .save_file(
             &bucket_id,
-            convert_to_byte_stream(
+            &file_data
+                .file
+                .content_type()
+                .unwrap_or(&ContentType::default())
+                .to_string(),
+            convert_to_bytes(
                 &mut file_data
                     .file
                     .open()
@@ -100,16 +104,9 @@ pub async fn upload(
                     .map_err(|_| Error::FileConvertError)?,
             )
             .await?,
-            Some(
-                &file_data
-                    .file
-                    .content_type()
-                    .unwrap_or(&ContentType::default())
-                    .to_string(),
-            ),
         )
         .await
-        .map_err(|_| Error::BucketConnectionError)?;
+        .map_err(|err| Error::from(err))?;
 
     transaction
         .commit()

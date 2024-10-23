@@ -1,0 +1,1 @@
+ALTER TABLE files RENAME COLUMN bucket_id TO storage_id;

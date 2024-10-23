@@ -1,11 +1,12 @@
 use crate::endpoint::v1::create_v1_routes;
-use endpoint::fairing::{bucket::BucketFairing, database::PostgresFairing};
+use endpoint::fairing::{database::PostgresFairing, storage::StorageDriverFairing};
 use rocket::{fairing::AdHoc, routes};
 use serde::{Deserialize, Serialize};
 
 pub mod database;
 pub mod endpoint;
 pub mod s3;
+pub mod storage;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GlobalConfig {
@@ -28,7 +29,7 @@ async fn main() -> Result<(), rocket::Error> {
             routes![endpoint::index::index, endpoint::index::show_file],
         )
         .attach(AdHoc::config::<GlobalConfig>())
-        .attach(BucketFairing::new())
+        .attach(StorageDriverFairing::new())
         .attach(PostgresFairing::new())
         .launch()
         .await?;

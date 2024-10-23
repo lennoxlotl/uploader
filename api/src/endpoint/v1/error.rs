@@ -7,6 +7,8 @@ use rocket::{
 };
 use serde::Serialize;
 
+use crate::storage::driver::StorageError;
+
 /// Stores attributes about an error
 pub struct ErrorAttributes {
     pub status_code: u16,
@@ -23,12 +25,12 @@ pub enum Error {
     #[error("The file does not exist")]
     #[uploader(status_code = 404)]
     FileNotFoundError,
-    #[error("Failed to delete file from bucket, try again later")]
+    #[error("Storage driver is not available")]
     #[uploader(status_code = 500)]
-    BucketDeleteError,
-    #[error("Failed to upload file to storage bucket")]
+    StorageUnavailableError,
+    #[error("Failed to access storage driver ({0})")]
     #[uploader(status_code = 500)]
-    BucketConnectionError,
+    InternalStorageError(#[from] StorageError),
     #[error("Failed to convert file byte stream")]
     #[uploader(status_code = 500)]
     FileConvertError,

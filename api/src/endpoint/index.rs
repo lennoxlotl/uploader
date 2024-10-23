@@ -1,8 +1,8 @@
 use super::{
-    fairing::{bucket::BucketGuard, database::PostgresDb},
+    fairing::{database::PostgresDb, storage::StorageDriverGuard},
     v1::{error::Error, UploaderResult},
 };
-use crate::{database::query::file::find_file_by_id, s3::bucket::BucketOperations, GlobalConfig};
+use crate::{database::query::file::find_file_by_id, GlobalConfig};
 use rocket::{
     get,
     http::ContentType,
@@ -55,24 +55,17 @@ pub async fn index() -> &'static str {
 pub async fn show_file(
     id: &str,
     database: PostgresDb,
-    bucket: BucketGuard,
+    storage: StorageDriverGuard,
     config: &State<GlobalConfig>,
 ) -> UploaderResult<FileShowResponse> {
     let mut transaction = database.begin().await.map_err(|_| Error::DatabaseError)?;
     let file = find_file_by_id(&mut transaction, &id.to_string())
         .await
         .map_err(|_| Error::FileNotFoundError)?;
-    let data = bucket.get(&file.bucket_id).await.unwrap();
-    let file_type = &data.content_type.ok_or(Error::FileConvertError)?;
-    let file_bytes = data
-        .body
-        .collect()
-        .await
-        .map_err(|_| Error::FileConvertError)?
-        .to_vec();
+    let (data, content_type) = storage.get_file(&file.storage_id).await.unwrap();
     Ok(FileShowResponse::new(
-        file_bytes,
-        file_type.to_string(),
+        data,
+        content_type,
         config.cache_length.unwrap_or(0),
     ))
 }

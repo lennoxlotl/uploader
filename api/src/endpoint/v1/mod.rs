@@ -1,4 +1,3 @@
-use aws_sdk_s3::primitives::ByteStream;
 use rocket::{
     tokio::io::{AsyncBufRead, AsyncReadExt},
     Route,
@@ -18,7 +17,7 @@ pub fn create_v1_routes() -> Vec<Route> {
     ]
 }
 
-/// Converts a tokio buffer (from form data) to a with the s3 api usable bytestream
+/// Converts a tokio buffer (from form data) to vector of bytes
 ///
 /// # Arguments
 ///
@@ -26,8 +25,8 @@ pub fn create_v1_routes() -> Vec<Route> {
 ///
 /// # Returns
 ///
-/// The converted stream
-pub(crate) async fn convert_to_byte_stream<T>(stream: &mut T) -> Result<ByteStream, error::Error>
+/// The converted vector of bytes
+pub(crate) async fn convert_to_bytes<T>(stream: &mut T) -> Result<Vec<u8>, error::Error>
 where
     T: AsyncBufRead + AsyncReadExt + Unpin,
 {
@@ -36,5 +35,5 @@ where
         .read_to_end(&mut bytes)
         .await
         .map_err(|_| error::Error::FileConvertError)?;
-    return Ok(ByteStream::from(bytes));
+    return Ok(bytes);
 }

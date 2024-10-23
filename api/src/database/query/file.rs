@@ -23,7 +23,7 @@ pub async fn save_file(
     size: &i64,
 ) -> DbResult<()> {
     sqlx::query(
-        r"INSERT INTO files (id, bucket_id, secret, uploaded_at, size) VALUES ($1, $2, $3, $4, $5)",
+        r"INSERT INTO files (id, storage_id, secret, uploaded_at, size) VALUES ($1, $2, $3, $4, $5)",
     )
     .bind(&id)
     .bind(&bucket_id)
