@@ -14,7 +14,7 @@ pub struct ErrorAttributes {
     pub status_code: u16,
 }
 
-#[derive(Debug, Clone, thiserror::Error, UploaderError)]
+#[derive(Debug, thiserror::Error, UploaderError)]
 pub enum Error {
     #[error("Invalid auth key")]
     #[uploader(status_code = 403)]

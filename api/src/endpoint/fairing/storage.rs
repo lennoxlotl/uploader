@@ -1,4 +1,4 @@
-use std::ops::Deref;
+use std::{ops::Deref, path::Path};
 
 use aws_credential_types::Credentials;
 use rocket::{
@@ -13,6 +13,7 @@ use crate::{
     storage::driver::StorageDriver,
 };
 
+// Provides access to the selected storage driver
 pub struct StorageDriverGuard(pub StorageDriver);
 
 pub struct StorageDriverFairing;
@@ -21,6 +22,7 @@ pub struct StorageDriverFairing;
 #[serde(rename_all = "snake_case")]
 pub enum StorageDriverType {
     ObjectStorage,
+    Drive,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -35,6 +37,11 @@ pub struct ObjectStorageConfig {
     access_key: String,
     access_key_secret: String,
     region: Option<String>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct DriveStorageConfig {
+    path: String,
 }
 
 impl Deref for StorageDriverGuard {
@@ -81,6 +88,13 @@ impl Fairing for StorageDriverFairing {
                         config.region,
                     ),
                 ))
+            }
+            StorageDriverType::Drive => {
+                let config: DriveStorageConfig =
+                    rocket.figment().focus("storage.drive").extract().expect(
+                        "Unable to load drive storage config, is it defined in Rocket.toml?",
+                    );
+                StorageDriver::drive(Path::new(config.path.as_str()).to_path_buf())
             }
         };
         Ok(rocket.manage(driver))

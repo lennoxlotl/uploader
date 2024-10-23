@@ -1,17 +1,20 @@
+use std::path::PathBuf;
+
 use thiserror::Error;
 
 use crate::s3::bucket::Bucket;
 
-use super::object_storage;
+use super::{drive, object_storage};
 
 pub type StorageResult<T> = std::result::Result<T, StorageError>;
 
 #[derive(Debug, Clone)]
 pub enum StorageDriver {
     ObjectStorage { bucket: Bucket },
+    Drive { path: PathBuf },
 }
 
-#[derive(Debug, Clone, Error)]
+#[derive(Debug, Error)]
 pub enum StorageError {
     #[error("Failed to save file in object storage bucket")]
     BucketSaveError,
@@ -19,11 +22,21 @@ pub enum StorageError {
     BucketLoadError,
     #[error("Failed to delete file from object storage bucket")]
     BucketDeleteError,
+    #[error("Failed to write file to drive ({0})")]
+    DriveWriteError(#[from] std::io::Error),
+    #[error("Failed to load file from drive")]
+    DriveLoadError,
+    #[error("Failed to delete file from drive")]
+    DriveDeleteError,
 }
 
 impl StorageDriver {
     pub fn object(bucket: Bucket) -> Self {
         Self::ObjectStorage { bucket }
+    }
+
+    pub fn drive(path: PathBuf) -> Self {
+        Self::Drive { path }
     }
 
     /// Saves a file in the storage driver
@@ -43,6 +56,7 @@ impl StorageDriver {
             Self::ObjectStorage { bucket } => {
                 object_storage::save_file(bucket, id, content_type, bytes).await
             }
+            Self::Drive { path } => drive::save_file(path, id, content_type, bytes).await,
         }
     }
 
@@ -58,6 +72,7 @@ impl StorageDriver {
     pub async fn get_file(&self, id: &str) -> StorageResult<(Vec<u8>, String)> {
         match self {
             Self::ObjectStorage { bucket } => object_storage::get_file(bucket, id).await,
+            Self::Drive { path } => drive::get_file(path, id).await,
         }
     }
 
@@ -69,6 +84,7 @@ impl StorageDriver {
     pub async fn delete_file(&self, id: &str) -> StorageResult<()> {
         match self {
             Self::ObjectStorage { bucket } => object_storage::delete_file(bucket, id).await,
+            Self::Drive { path } => drive::delete_file(path, id).await,
         }
     }
 }

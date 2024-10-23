@@ -30,7 +30,7 @@ This roadmap is constantly updated with new ideas and features that are planned 
 #### API
 - [ ] Multiple auth-keys stored in Postgres
 - [ ] Simple CLI application for creating auth-keys and administrating the service
-- [ ] Support for multiple storage "drivers" (e.g. local file system)
+- [x] Support for multiple storage "drivers" (e.g. local file system)
 
 #### General
 - [ ] Issue and Pull Request templates to make contribution easier

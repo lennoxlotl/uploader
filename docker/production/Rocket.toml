@@ -9,7 +9,10 @@ auth_key = "hi"
 data-form = "16MiB"
 file = "16MiB"
 
-[default.bucket]
+[default.storage]
+storage_type = "object"
+
+[default.storage.object]
 access_key = ""
 access_key_secret = ""
 name = "files"
