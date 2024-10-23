@@ -1,20 +1,40 @@
 use super::{
     fairing::{database::PostgresDb, storage::StorageDriverGuard},
     v1::{error::Error, UploaderResult},
+    SuccessReporter,
 };
 use crate::{database::query::file::find_file_by_id, GlobalConfig};
+use build_info::BuildInfo;
 use rocket::{
     get,
     http::ContentType,
     response::{self, Responder},
+    serde::json::Json,
     Request, Response, State,
 };
+use serde::Serialize;
 use std::{io::Cursor, str::FromStr};
 
 pub struct FileShowResponse {
     data: Vec<u8>,
     content_type: String,
     cache_time: usize,
+}
+
+#[derive(Debug, Serialize)]
+pub struct ServerInfoResponse {
+    #[serde(flatten)]
+    success: SuccessReporter,
+    version: String,
+}
+
+impl ServerInfoResponse {
+    pub fn new(version: String) -> Self {
+        Self {
+            success: SuccessReporter::new(true),
+            version,
+        }
+    }
 }
 
 impl FileShowResponse {
@@ -45,10 +65,10 @@ impl<'r> Responder<'r, 'static> for FileShowResponse {
     }
 }
 
-// TODO: come up with something better
 #[get("/")]
-pub async fn index() -> &'static str {
-    "hi :wave:"
+pub async fn index() -> Json<ServerInfoResponse> {
+    let info: &BuildInfo = build_info();
+    Json(ServerInfoResponse::new(info.crate_info.version.to_string()))
 }
 
 #[get("/<id>")]
@@ -69,3 +89,5 @@ pub async fn show_file(
         config.cache_length.unwrap_or(0),
     ))
 }
+
+build_info::build_info!(fn build_info);

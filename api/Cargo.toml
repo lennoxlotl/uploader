@@ -22,3 +22,7 @@ sqlx = { version = "0.8.2", features = [
 ] }
 uuid = { version = "1.11.0", features = ["v4"] }
 log = "0.4.22"
+build-info = "0.0.39"
+
+[build-dependencies]
+build-info-build = "0.0.39"

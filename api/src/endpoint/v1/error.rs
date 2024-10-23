@@ -7,7 +7,7 @@ use rocket::{
 };
 use serde::Serialize;
 
-use crate::storage::driver::StorageError;
+use crate::{endpoint::SuccessReporter, storage::driver::StorageError};
 
 /// Stores attributes about an error
 pub struct ErrorAttributes {
@@ -41,12 +41,17 @@ pub enum Error {
 
 #[derive(Debug, Serialize)]
 pub struct RocketErrorResponse {
+    #[serde(flatten)]
+    success: SuccessReporter,
     message: String,
 }
 
 impl RocketErrorResponse {
     pub fn new(message: String) -> Self {
-        Self { message }
+        Self {
+            success: SuccessReporter::new(false),
+            message,
+        }
     }
 }
 
