@@ -1,6 +1,6 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{Attribute, Data, DeriveInput, LitInt, Token};
+use syn::{Attribute, Data, DeriveInput, Fields, LitInt, Token};
 
 type TokenStream2 = proc_macro2::TokenStream;
 
@@ -18,17 +18,43 @@ pub fn uploader_error_impl(input: DeriveInput) -> TokenStream {
     // Parse all contents of the Enum
     if let Data::Enum(e) = input.data {
         for variant in e.variants {
-            let ident = variant.ident;
+            let ident = &variant.ident;
             let attributes =
                 extract_field_attr(&variant.attrs).expect("Unable to parse Enum variant");
 
             let status_code = attributes.status_code.unwrap();
 
-            match_stream.extend(quote! {
-                Self::#ident => ErrorAttributes {
-                    status_code: #status_code
-                },
-            });
+            match &variant.fields {
+                Fields::Unit => {
+                    match_stream.extend(quote! {
+                        Self::#ident => ErrorAttributes {
+                            status_code: #status_code
+                        },
+                    });
+                }
+                Fields::Unnamed(fields) => {
+                    let field_pats = fields.unnamed.iter().enumerate().map(|(i, _)| {
+                        let pat_ident = syn::Ident::new(&format!("_{}", i), ident.span());
+                        quote! { #pat_ident }
+                    });
+                    match_stream.extend(quote! {
+                        Self::#ident(#(#field_pats),*) => ErrorAttributes {
+                            status_code: #status_code
+                        },
+                    });
+                }
+                Fields::Named(fields) => {
+                    let field_pats = fields.named.iter().map(|field| {
+                        let field_ident = field.ident.as_ref().unwrap();
+                        quote! { #field_ident }
+                    });
+                    match_stream.extend(quote! {
+                        Self::#ident { #(#field_pats),* } => ErrorAttributes {
+                            status_code: #status_code
+                        },
+                    });
+                }
+            }
         }
     }
 
