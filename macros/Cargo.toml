@@ -6,7 +6,7 @@ authors = ["Lennox Schneider <admin@lennoxlotl.dev>"]
 
 [dependencies]
 log = "0.4.22"
-proc-macro2 = "1.0.88"
+proc-macro2 = "1.0.89"
 quote = "1.0.37"
 serde = { version = "1.0.210", features = ["derive"] }
 sqlx = { version = "0.8.2", features = ["postgres", "runtime-tokio-native-tls"] }
