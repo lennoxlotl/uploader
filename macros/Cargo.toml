@@ -10,7 +10,7 @@ proc-macro2 = "1.0.89"
 quote = "1.0.37"
 serde = { version = "1.0.213", features = ["derive"] }
 sqlx = { version = "0.8.2", features = ["postgres", "runtime-tokio-native-tls"] }
-syn = { version = "2.0.82", features = ["full"] }
+syn = { version = "2.0.86", features = ["full"] }
 openssl = { version = "0.10.68", features = ["vendored"] }
 
 [lib]
