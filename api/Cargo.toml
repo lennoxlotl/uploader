@@ -12,7 +12,7 @@ aws-credential-types = { version = "1.2.1", features = [
 ] }
 aws-config = "1.5.8"
 async-trait = "0.1.83"
-serde = "1.0.213"
+serde = "1.0.216"
 thiserror = "1.0.65"
 rand = "0.8.5"
 macros = { path = "../macros" }
