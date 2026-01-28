@@ -36,8 +36,7 @@ jobs:
           else
             echo "VERSION=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_ENV
           fi
-      - name: Install cross (for aarch64 builds)
-        if: matrix.platform.fancy == 'arm64'
+      - name: Install cross
         run: cargo install cross
       - name: Build binary (aarch64)
         if: matrix.platform.fancy == 'arm64'
