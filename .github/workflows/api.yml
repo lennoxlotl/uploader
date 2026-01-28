@@ -47,7 +47,7 @@ jobs:
         run: mv target/aarch64-unknown-linux-gnu/release/api api/api
       - name: Build binary (amd64)
         if: matrix.platform.fancy == 'amd64'
-        run: cargo build --release
+        run: cross build --target x86_64-unknown-linux-gnu --release
       - name: Copy binary (amd64)
         if: matrix.platform.fancy == 'amd64'
         run: mv target/release/api api/api
